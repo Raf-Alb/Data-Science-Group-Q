@@ -239,7 +239,15 @@ The `position` column often contains dual entries (e.g., "SF/SG"). We chose to k
 ```{python}
 # keep only the players from NBA
 merged_NBA = merged[merged['League'] == 'NBA']
+```
 
+For the remainder of this project, the analysis focuses exclusively on the NBA. 
+This choice is motivated by the league’s consistent level of competition, standardized rules, 
+and high-quality data availability. Restricting the scope to the NBA allows for more reliable 
+comparisons between players and seasons, while reducing variability introduced by differences 
+across leagues.
+
+```{python}
 # Filtering for Regular Season or Playoffs models
 merged_NBA_regular = merged_NBA[merged_NBA['Stage'] == 'Regular_Season'].copy()
 merged_NBA_playoffs = merged_NBA[merged_NBA['Stage'] == 'Playoffs'].copy()
@@ -341,19 +349,19 @@ def plot_player_distribution(df, player_col, value_col, unit=None):
 ```
 ```{python}
 # call of the function to plot the height
-plot_player_distribution(merged, player_col='Player', value_col='height_anthro', unit='cm')
+plot_player_distribution(merged_NBA, player_col='Player', value_col='height_anthro', unit='cm')
 ```
 ```{python}
 # call of the function to plot the weight
-plot_player_distribution(merged, player_col='Player', value_col='weight_anthro', unit='kg')
+plot_player_distribution(merged_NBA, player_col='Player', value_col='weight_anthro', unit='kg')
 ```
 ```{python}
 # call of the function to plot the age of the players at the start of each season they have played
-plot_player_distribution(merged, player_col='keyfactor', value_col='age_debut_saison', unit='years')
+plot_player_distribution(merged_NBA, player_col='keyfactor', value_col='age_debut_saison', unit='years')
 ```
 ```{python}
 # call of the function to plot the overall EFF per minutes
-plot_player_distribution(merged, player_col='keyfactor', value_col='EFF_per_min', unit='performance')
+plot_player_distribution(merged_NBA, player_col='keyfactor', value_col='EFF_per_min', unit='performance')
 ```
 Here we visualize the target variable `EFF_per_min`. As explained in the preprocessing, the values are small. The distribution is somewhat normal but with a right skew.
 Which indicates that "superstar" productivity is rare. Most players cluster around the 0.4-0.6 range.
@@ -559,15 +567,19 @@ After that, we explored the relationship between player attributes and performan
 ```{python}
 regression_lineaire(merged_NBA, 'EFF_per_min', ['height_anthro'])
 ```
+The regression shows a positive and statistically significant effect of height on efficiency per minute, with an estimated coefficient of 0.004 (p < 0.001), but the model has low explanatory power, with an R-squared of 0.056 (N = 3,588).
 ```{python}
 regression_lineaire(merged_NBA, 'EFF_per_min', ['wingspan'])
 ```
+The regression shows a positive and statistically significant effect of height on efficiency per minute, with an estimated coefficient of 0.004 (p < 0.001), but the model has limited explanatory power, with an R-squared of 0.090 (N = 3,593).
 ```{python}
 regression_lineaire(merged_NBA, 'EFF_per_min', ['weight_anthro'])
 ```
+The regression shows a positive and statistically significant effect of height on efficiency per minute, with an estimated coefficient of 0.003 (p < 0.001), but the model has low explanatory power, with an R-squared of 0.064 (N = 3,586).
 ```{python}
 regression_lineaire(merged_NBA, 'EFF_per_min', ['age_debut_saison'])
 ```
+The regression shows that age at season debut has no statistically significant effect on the dependent variable (p = 0.859), and the model has virtually no explanatory power, with an R-squared close to zero, despite a large sample size (N = 3,603).
 
 ## Multiple Linear Regressions
 
@@ -620,7 +632,7 @@ print("Model: EFF_per_min = B0 + B1*Height + B2*Weight + B3*Age + B4*(Height * A
 multiple_regression_formula(formula1, merged_NBA_regular)
 ```
 
-The first model, which excludes player position, shows that both height and weight are significant predictors, with positive coefficients suggesting that taller and heavier players tend to have higher efficiency per minute (`EFF_per_min`). However, Age and its interaction with height are found to be statistically insignificant.  This model only accounts for a small amount of the variance in efficiency, as indicated by a low $\text{R-squared}$ of $0.088$.
+The first model, which excludes player position, shows that both height and weight are significant predictors, with positive coefficients suggesting that taller and heavier players tend to have higher efficiency per minute (`EFF_per_min`). However, Age and its interaction with height are found to be statistically insignificant.  This model only accounts for a small amount of the variance in efficiency, as indicated by a low **R-squared** of **0.088**.
 ```{python}
 formula2 = 'EFF_per_min ~ height_anthro + weight_anthro + age_debut_saison + height_anthro:age_debut_saison + C(Simplified_Position)'
 
@@ -629,7 +641,7 @@ print("Model: EFF_per_min = f(Height, Weight, Age, Height * Age, Position)")
 multiple_regression_formula(formula2, merged_NBA_regular)
 ```
 
-The second, more powerful model (with $\text{R-squared}=0.160$) confirms that Position is a major determinant of efficiency. The significant and negative coefficients for PF, SF, and SG (relative to the unlisted reference position C) indicate that these positions typically have lower `EFF_per_min`. Critically, even in this more comprehensive model, the effects of Age and the height-age interaction remain statistically insignificant (p-values $>0.4$), meaning the written interpretation at the bottom regarding age improving efficiency is not supported by this specific data.
+The second, more powerful model (with **R-squared**=**0.160**) confirms that Position is a major determinant of efficiency. The significant and negative coefficients for PF, SF, and SG (relative to the unlisted reference position C) indicate that these positions typically have lower `EFF_per_min`. Critically, even in this more comprehensive model, the effects of Age and the height-age interaction remain statistically insignificant (p-values **>0.4**), meaning the written interpretation at the bottom regarding age improving efficiency is not supported by this specific data.
 
 ## Regular Season VS Playoffs
 
@@ -695,8 +707,6 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 # Save the figure
 plt.savefig('performance_evolution_by_age.png', dpi=300, bbox_inches="tight")
 
-#  COMMAND TO DISPLAY THE PLOT INTERACTIVELY 
-plt.show()
 ```
 
 ![Regular Season Performance](performance_evolution_by_age.png)
@@ -771,8 +781,7 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 # Save the figure
 plt.savefig('performance_evolution_by_age_playoffs.png', dpi=300, bbox_inches="tight")
 
-#  COMMAND TO DISPLAY THE PLOT INTERACTIVELY 
-plt.show()
+
 ```
 
 ![Playoffs Performance](performance_evolution_by_age_playoffs.png)
@@ -1050,20 +1059,32 @@ r2_lin, r2_poly = compare_linear_polynomial(merged_NBA, "height_anthro", degree=
 ```
 
 ```{python}
-# Multiple Polynomial Regression: Predicting EFF_per_min
 # Prepare data
-df = merged_NBA.dropna(subset=["EFF_per_min", "height_anthro", "wingspan", "position"]).copy()
+df = merged_NBA.dropna(
+    subset=["EFF_per_min", "height_anthro", "wingspan", "weight_anthro", "position"]
+).copy()
+
 df.loc[:, "position_simple"] = df["position"].str.split("/").str[0]
 
-X = df[["height_anthro", "wingspan", "position_simple"]]
+X = df[["height_anthro", "wingspan", "weight_anthro", "position_simple"]]
 y = df["EFF_per_min"].values
 
 print(f"Number of observations: {len(df)}")
 
-# Preprocessor: Polynomial for continuous, OneHot for categorical
+# Preprocessor:
+# - Polynomial terms for anthropometrics
+# - One-hot encoding for position
 preprocessor = ColumnTransformer([
-    ("poly_features", PolynomialFeatures(degree=2, include_bias=False), ["height_anthro", "wingspan"]),
-    ("position_simple", OneHotEncoder(drop='first', sparse_output=False), ["position_simple"])
+    (
+        "poly_features",
+        PolynomialFeatures(degree=2, include_bias=False),
+        ["height_anthro", "wingspan", "weight_anthro"]
+    ),
+    (
+        "position_simple",
+        OneHotEncoder(drop="first", sparse_output=False),
+        ["position_simple"]
+    )
 ])
 
 # Pipeline
@@ -1074,48 +1095,58 @@ model = Pipeline([
 
 # Fit model
 model.fit(X, y)
+
+# Model fit
 y_pred = model.predict(X)
 r2 = r2_score(y, y_pred)
-print(f"R² of the model: {r2:.4f}")
 
-# Extract coefficients
-coef = model.named_steps["regression"].coef_
-intercept = model.named_steps["regression"].intercept_
+# ============================
+# OLS output (interpretable)
+# ============================
+
+# Get feature names
 feature_names = model.named_steps["preprocessor"].get_feature_names_out()
+feature_names_with_intercept = ["Intercept"] + list(feature_names)
 
-# Display equation
-print("\n=== Estimated Regression Equation ===")
-print(f"EFF_per_min = {intercept:.4f}")
-for name, c in zip(feature_names, coef):
-    print(f" + {c:.4f} * {name}")
-
-# Statsmodels OLS for detailed table
+# Statsmodels OLS
 X_transformed = model.named_steps["preprocessor"].transform(X)
 X_sm = sm.add_constant(X_transformed)
 ols_model = sm.OLS(y, X_sm).fit()
 
-# Extract table of coefficients
+# Extract results table
 df_results = ols_model.summary2().tables[1].copy()
-df_results.columns = ['Coefficient', 'Std.Err.', 't-stat', 'P-value', 'Conf.Int.[0.025', '0.975]']
+df_results.index = feature_names_with_intercept
 
-# Color p-values for Quarto
+df_results.columns = [
+    "Coefficient",
+    "Std. Error",
+    "t-statistic",
+    "P-value",
+    "CI 2.5%",
+    "CI 97.5%"
+]
+
+# Styling for Quarto
 def style_pvalue(val):
     if val < 0.05:
-        return 'background-color: #d4edda; color: #155724; font-weight: bold'
+        return "background-color: #d4edda; color: #155724; font-weight: bold"
     else:
-        return 'color: #721c24'
+        return "color: #721c24"
 
-jolie_table = (df_results.style
-    .map(style_pvalue, subset=['P-value'])
+styled_table = (
+    df_results.style
     .format("{:.4f}")
-    .background_gradient(cmap='Blues', subset=['Coefficient'])
-    .set_caption("Detailed OLS Regression Results")
+    .map(style_pvalue, subset=["P-value"])
+    .background_gradient(cmap="Blues", subset=["Coefficient"])
+    .set_caption(
+        "📊 Polynomial Regression Results: Height, Wingspan, Weight, and Position"
+    )
 )
 
-display(jolie_table)
+display(styled_table)
 
 ```
-We then tried with a multiple polynomial regression model to predict EFF_per_min based on player anthropometric features (height, wingspan) and position. Continuous variables are modeled with second-degree polynomial terms, while positions are one-hot encoded. The model outputs coefficients, R², and a stylized table highlighting significant predictors for easy interpretation in Quarto.
+The intercept should not be interpreted as a realistic performance level, as it corresponds to a hypothetical player with zero height, wingspan, and weight. In this polynomial regression, the intercept primarily serves as a mathematical anchor that allows the model to fit non-linear relationships within the realistic range of NBA player characteristics.
 
 ```{python}
 
