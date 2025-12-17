@@ -38,7 +38,7 @@ Our project uses two primary datasets found on kaggle.com:
 
 players_stats_by_season_full_details.xlsx, which covers professional basketball seasons from 1999 to 2020 across 49 leagues, representing around 11,000 players. It contains detailed information such as birth dates, height, weight, nationality, and high school background, along with comprehensive season statistics (points, rebounds, assists, shooting percentages, minutes, games played, and more). This dataset offers much more than raw numbers: it provides a broad view of global player performance over more than two decades, making it a strong foundation for comparative and longitudinal analysis.
 
-NBA_Anthropometric.csv, which contains anthropometric measurements from NBA Draft Combine events held between 2000 and 2023. The NBA Draft Combine is a yearly showcase where invited prospects undergo physical testing, medical exams, athletic drills, shooting evaluations, and five-on-five scrimmages in front of NBA coaches, general managers, and scouts. Since combine results can strongly influence a player's draft stock and career opportunities, these measurements are highly relevant for performance analysis. The data was originally obtained through the NBA Stats API and converted from imperial to metric units.
+NBA_Anthropometric.csv, which contains anthropometric measurements from NBA Draft Combine events held between 2000 and 2023. The NBA Draft Combine is a yearly showcase where invited prospects undergo physical testing, medical exams, athletic drills, shooting evaluations, and five-on-five scrimmages in front of NBA coaches, general managers, and scouts. But this file includes only a limited set of physical measurements (height, weight, wingspan, arm length, etc.) converted from imperial to metric units, representing just a small part of all data collected at the Combine. The data was originally obtained through the NBA Stats API and converted from imperial to metric units.
 
 Both datasets were loaded into Python and inspected to understand their structure.
 
@@ -570,11 +570,11 @@ The regression shows a positive and statistically significant effect of height o
 ```{python}
 regression_lineaire(merged_NBA, 'EFF_per_min', ['wingspan'])
 ```
-The regression shows a positive and statistically significant effect of height on efficiency per minute, with an estimated coefficient of 0.004 (p < 0.001), but the model has limited explanatory power, with an R-squared of 0.090 (N = 3,593).
+The regression shows a positive and statistically significant effect of wingspan on efficiency per minute, with an estimated coefficient of 0.004 (p < 0.001), but the model has limited explanatory power, with an R-squared of 0.090 (N = 3,593).
 ```{python}
 regression_lineaire(merged_NBA, 'EFF_per_min', ['weight_anthro'])
 ```
-The regression shows a positive and statistically significant effect of height on efficiency per minute, with an estimated coefficient of 0.003 (p < 0.001), but the model has low explanatory power, with an R-squared of 0.064 (N = 3,586).
+The regression shows a positive and statistically significant effect of weight on efficiency per minute, with an estimated coefficient of 0.003 (p < 0.001), but the model has low explanatory power, with an R-squared of 0.064 (N = 3,586).
 ```{python}
 regression_lineaire(merged_NBA, 'EFF_per_min', ['age_debut_saison'])
 ```
@@ -1136,7 +1136,7 @@ To ensure anthropometric realism in the optimization procedure, wingspan is not 
 ws_height_ratio = (df["wingspan"] / df["height_anthro"]).mean()
 
 # Extended realistic ranges (NBA plausible extremes)
-height_range = np.linspace(175, 245, 60)      # allow very tall players
+height_range = np.linspace(175, 235, 60)      # allow very tall players
 weight_range = np.linspace(65, 160, 50)       # include very heavy centers
 positions = df["position_simple"].unique()
 
@@ -1183,7 +1183,7 @@ for k, v in best_player.items():
 
 ```
 
-We modeled the resulting surface, which isolates the combined effect of height and weight on efficiency while preserving realistic body proportions. As we can see, there is an optimal point around **110 kg** for the tallest measurements allowed.
+We modeled the resulting surface, which isolates the combined effect of height and weight on efficiency while preserving realistic body proportions. As we can see, there is an optimal point around **108 kg** for the tallest measurements allowed.
 
 ```{python}
 # Compute average wingspan-to-height ratio in NBA
@@ -1193,7 +1193,7 @@ print(f"Average NBA wingspan-to-height ratio: {ws_height_ratio:.3f}")
 
 # Define realistic ranges
 
-height_range = np.linspace(175, 245, 60)
+height_range = np.linspace(175, 235, 60)
 weight_range = np.linspace(65, 160, 50)
 
 # Fix position
@@ -1269,8 +1269,6 @@ When looking at performance over age, we identified a clear peak around 27.4 yea
 
 We also noticed that player position explains a big part of the differences in EFF per minute. Interior players, so mainly Centers (C) and Power Forwards (PF), tend to show higher efficiency than perimeter players such as Small Forwards (SF), Shooting Guards (SG), and Point Guards (PG). This makes sense because players in inside positions are closer to the basket, take higher-percentage shots, and are more involved in rebounds and actions near the rim, which naturally boosts their efficiency.
 
-Another interesting pattern is that players who are still active at older ages usually have a very high EFF, which means that players have to be really good to stay in the league after a certain age. 
-
 We then compared Regular Season and Playoffs performances. We expected players to perform better in Playoffs because the games matter more, but what we observed is the opposite: almost everyone sees their EFF drop. The simplest explanation, besides higher pressure, is the increase in defensive intensity, as scoring becomes harder, mistakes are punished more, and efficiency tends to fall. Only two players in our dataset actually improved their EFF in the Playoffs; for all the others, it went down.
 
 Lastly, we used a centered polynomial regression to better understand how players’ physical characteristics and positions relate to efficiency per minute. By focusing on an average player, this approach allowed us to interpret the results more intuitively. The model shows that wingspan and weight are the most relevant physical factors, with some non-linear effects, while height alone plays a more limited role. Position also remains important, as point guards and power forwards tend to display slightly higher efficiency compared to other roles. Overall, this analysis complements our earlier findings by showing how physical attributes and positional roles help explain differences in performance beyond age and experience.
@@ -1279,7 +1277,7 @@ Lastly, we used a centered polynomial regression to better understand how player
 
 ## Summary of main findings
 
-In this project, we analyzed NBA player performance using physical attributes, age, position, and efficiency per minute metrics. Our results show that physical characteristics such as height, weight, and especially wingspan are positively related to efficiency per minute, although their explanatory power remains limited. We also identified a clear performance peak around 27.4 years old, which reflects the balance between physical prime and accumulated experience. In addition, player position plays a major role in explaining differences in efficiency, with interior players generally displaying higher `EFF_per_min`than perimeter players.
+In this project, we analyzed NBA player performance using physical attributes, age, position, and efficiency per minute metrics. Our results show that physical characteristics such as height, weight, and especially wingspan are positively related to efficiency per minute, although their explanatory power remains limited. We also identified a clear performance peak around 27.4 years old, which reflects the balance between physical prime and accumulated experience. In addition, player position plays a major role in explaining differences in efficiency, with point guards and power forwards generally displaying higher `EFF_per_min` than other roles.
 
 ## Practical implications
 
