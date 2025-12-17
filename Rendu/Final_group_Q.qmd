@@ -26,13 +26,13 @@ jupyter: python3
 
 The goal of this project is to analyze basketball player performance and identify the factors that most influence it. Specifically, we focus on NBA players, using detailed player statistics and physical attributes to explore performance trends and build predictive models. This project anchors itself in the high-stakes reality of modern sports management. In a multi-billion dollar industry where recruitment errors are costly, General Managers and scouts increasingly rely on data to move beyond the traditional "eye test." Our analysis aims to provide actionable insights for optimizing roster construction and contract negotiations.
 
-Our research questions are centered around understanding which variables are most predictive of performance. For example, we seek to determine how players and performances evolve over time, how physical characteristics influence effectiveness, and which metrics can best predict scoring and overall contribution to the game.
+Our research questions are centered on identifying which variables are most predictive of performance. In particular, we aim to understand how players and their performances evolve over time, how physical characteristics influence effectiveness, and which metrics best predict scoring and overall contribution to the game. In addition, we develop a predictive model designed to identify the combination of player features that leads to optimal efficiency.
 
 This project builds on our original proposal by incorporating a broader dataset covering 49 leagues and over 11,000 players from 1999 to 2020. The dataset includes detailed performance statistics, contextual information (league, season, stage), biometric data (height, weight, birth year), and background information (draft, high school, nationality). Our initial focus was on exploratory data analysis (EDA) to understand the structure and key features of the data. After reviewing the dataset, we refined our approach to include both EDA and predictive modeling, allowing us to quantify relationships between variables and estimate future player performance.    
 
 # Data 
 
-## Data Sources
+## Data sources
 
 Our project uses two primary datasets found on kaggle.com:
 
@@ -57,7 +57,7 @@ import plotly.graph_objects as go
 from scipy import stats
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures, OneHotEncoder
+from sklearn.preprocessing import PolynomialFeatures, OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import r2_score
 from itertools import product
@@ -83,7 +83,7 @@ except FileNotFoundError:
     print("Error: Data files not found. Please ensure xlsx and csv are in the folder.")
 ```
 
-## Data Cleaning and Pre-processing
+## Data cleaning and pre-processing
 
 The two datasets did not perfectly match (different naming formats, missing players, duplicates).
 As a first step, we identified and kept only the players present in both datasets.
@@ -273,13 +273,13 @@ merged_NBA_regular.to_csv('merged_NBA_regular.csv', index=False)
 merged_NBA_playoffs.to_csv('merged_NBA_playoffs.csv', index=False)
 ```
 
-## Main Challenges 
+## Main challenges 
 
 The main challenges were merging the two datasets and eliminating duplicate columns. We considered integrating the teams each player played for, but creating dummy variables for all teams made the system cumbersome and difficult to use. Beyond the technical complexity, integrating the teams is particularly irrelevant in our case. We don't have a complete sample of players for each team, and we don't know precisely when players play together during the season.
 
 # Exploratory Data Analysis (EDA)
 
-## Summary Statistics
+## Summary statistics
 
 We began our analysis by examining player physical characteristics, focusing first on height, weight, age at the start of the season, and EFF per minute. Using histograms and boxplots (considering each player only once), we explored the distribution of these stats among all players in the dataset. Summary statistics indicated the average, median, standard deviation, and interquartile range of for each player, while extreme values were flagged as potential outliers. This step allowed us to identify unusual or inconsistent entries and better understand the baseline characteristics of our population.
 
@@ -367,7 +367,7 @@ Here we visualize the target variable `EFF_per_min`. As explained in the preproc
 Which indicates that "superstar" productivity is rare. Most players cluster around the 0.4-0.6 range.
 
 
-We also analyzed how player performance changes with age by looking at per-minute efficiency (EFF/Min) for players who played multiple seasons. Using a polynomial trend line, we were able to see the general evolution of performance across a career and identify the age at which players typically reach their peak. This analysis is important because it shows not just individual variation but the overall pattern of development and decline, helping us understand typical career trajectories in the NBA.
+We also analyzed how player performance changes with age by looking at per-minute efficiency for players who played multiple seasons. Using a polynomial trend line, we were able to see the general evolution of performance across a career and identify the age at which players typically reach their peak. This analysis is important because it shows not just individual variation but the overall pattern of development and decline, helping us understand typical career trajectories in the NBA.
 ```{python}
 # Determine the age column
 age_col = 'Age'
@@ -501,12 +501,11 @@ First, the distributions of height, weight, and age confirmed the expected struc
 
 When looking at efficiency across ages, the curve we plotted showed a clear performance peak at around 27.4 years old. This aligns with the idea that players combine both physical prime and solid experience at that age. Before that, efficiency tends to increase gradually as players develop, and after the peak, we observed a slow decline that matches the natural physical aging curve. Even though this is just a broad trend, it gives a first impression of how career progression typically looks in the NBA.
 
-
-![Peak Performance Curve](efficiency_evolution_by_age.png)
-
 # Analysis
 
-For the analysis, we focused on a few statistical models to better understand which factors actually drive player performance. We mainly used simple and multiple linear regressions to see how variables like height, weight, wingspan, age, and position relate to EFF per minute when looked at together. These models help us go beyond basic trends from the EDA and test whether the patterns we saw still hold once variables are combined.
+For the analysis, we focused on a few statistical models to better understand which factors actually drive player performance. We mainly used simple and multiple linear regressions to see how variables like height, weight, wingspan, age, and position relate to `EFF_per_min` when looked at together. These models help us go beyond basic trends from the EDA and test whether the patterns we saw still hold once variables are combined.  
+
+In a second step, we introduced polynomial regressions to capture potential non-linear effects between physical attributes and performance. Finally, we built a predictive model that combines anthropometric variables and player position to estimate efficiency per minute and explore theoretical optimal player profiles under realistic physical constraints.
 ```{python}
 # creation of a linear regression function with statsmodels
 def regression_lineaire(df, cible, variables):
@@ -561,7 +560,7 @@ def regression_lineaire(df, cible, variables):
     return results
 ```
 
-## Simple Linear Regressions
+## Simple linear regressions
 
 After that, we explored the relationship between player attributes and performance using simple linear regression models. Specifically, we regressed `EFF_per_min` on individual physical or demographic variables, such as height. This approach allowed us to quantify how each attribute influences overall efficiency per minute and to assess the statistical significance of the effect. For example, regressing efficiency on height helped determine whether taller players tend to be more effective on a per-minute basis. By running these regressions for several key variables, we identified which attributes are significant predictors of performance and which have little to no measurable effect.
 ```{python}
@@ -581,7 +580,7 @@ regression_lineaire(merged_NBA, 'EFF_per_min', ['age_debut_saison'])
 ```
 The regression shows that age at season debut has no statistically significant effect on the dependent variable (p = 0.859), and the model has virtually no explanatory power, with an R-squared close to zero, despite a large sample size (N = 3,603).
 
-## Multiple Linear Regressions
+## Multiple linear regressions
 
 ```{python}
 def multiple_regression_formula(formula, data):
@@ -622,7 +621,7 @@ def multiple_regression_formula(formula, data):
 
 ```
 
-After analyzing individual variables with simple regressions, we then performed multiple linear regressions to see how these factors together influence scoring efficiency. For example, we modeled EFF_per_min as a function of height, weight, age, and the interaction between height and age. We did that including the position of the player as well, which influences quite a lot how much a player scores, since different positions have different typical roles and responsibilities on the court.
+After analyzing individual variables with simple regressions, we then performed multiple linear regressions to see how these factors together influence scoring efficiency. For example, we modeled `EFF_per_min` as a function of height, weight, age, and the interaction between height and age. We did that including the position of the player as well, which influences quite a lot how much a player scores, since different positions have different typical roles and responsibilities on the court.
 
 ```{python}
 formula1 = 'EFF_per_min ~ height_anthro + weight_anthro + age_debut_saison + height_anthro:age_debut_saison'
@@ -641,11 +640,12 @@ print("Model: EFF_per_min = f(Height, Weight, Age, Height * Age, Position)")
 multiple_regression_formula(formula2, merged_NBA_regular)
 ```
 
-The second, more powerful model (with **R-squared**=**0.160**) confirms that Position is a major determinant of efficiency. The significant and negative coefficients for PF, SF, and SG (relative to the unlisted reference position C) indicate that these positions typically have lower `EFF_per_min`. Critically, even in this more comprehensive model, the effects of Age and the height-age interaction remain statistically insignificant (p-values **>0.4**), meaning the written interpretation at the bottom regarding age improving efficiency is not supported by this specific data.
+The second, more powerful model (with **R-squared**=**0.160**) confirms that Position is a major determinant of efficiency. The significant and negative coefficients for PF, SF, and SG (relative to the unlisted reference position C) indicate that these positions typically have lower `EFF_per_min`.  
+Although the exploratory analysis suggests a clear age-related performance pattern, age is not statistically significant in the multiple regression models once physical attributes and position are controlled for. This indicates that age captures broad career trends rather than a direct effect on efficiency per minute.
 
-## Regular Season VS Playoffs
+## Regular season vs playoffs
 
-We finally compared performance in the regular season with that in the playoffs. This comparison is particularly important because playoff games carry higher stakes: players are expected to perform at their best, yet they also face greater pressure. 
+We finally compared performance in the regular season with that in the playoffs. This comparison is particularly important because playoffs games carry higher stakes: players are expected to perform at their best, yet they also face greater pressure. 
 ```{python}
 #  3. Visualization: Evolution of the 4 performance metrics by Age 
 metrics_to_plot = {
@@ -706,6 +706,7 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 # Save the figure
 plt.savefig('performance_evolution_by_age.png', dpi=300, bbox_inches="tight")
+plt.close(fig)
 
 ```
 
@@ -780,11 +781,22 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 # Save the figure
 plt.savefig('performance_evolution_by_age_playoffs.png', dpi=300, bbox_inches="tight")
-
+plt.close(fig)
 
 ```
 
-![Playoffs Performance](performance_evolution_by_age_playoffs.png)
+![Playoffs Performance](performance_evolution_by_age_playoffs.png)  
+
+**Regular season vs. playoffs performance**
+
+Overall, players exhibit reduced offensive efficiency in the playoffs. 
+Declines in points, assists, and overall efficiency suggest that the heightened defensive intensity 
+and pressure of postseason competition limit scoring opportunities and offensive flow. 
+Defensive metrics, such as steals and rebounds, also decrease slightly, reflecting the more 
+physical and strategic nature of playoffs games. Metrics related to rare events, like missed shots 
+or blocks, remain largely unchanged, indicating that shooting accuracy and occasional defensive 
+actions are less affected by the stage.
+
 ```{python}
 # 1. Filter multi-season players and clean data
 player_season_counts = merged_NBA.groupby('Player')['Season'].nunique()
@@ -851,16 +863,14 @@ results_df = results_df.sort_values("p-value")
 
 results_df
 ```
+  
+  
+**Elite players and playoffs performance**
 
-**Regular Season vs. Playoffs Performance**
-
-Overall, players exhibit reduced offensive efficiency in the playoffs. 
-Declines in points, assists, and overall efficiency suggest that the heightened defensive intensity 
-and pressure of postseason competition limit scoring opportunities and offensive flow. 
-Defensive metrics, such as steals and rebounds, also decrease slightly, reflecting the more 
-physical and strategic nature of playoff games. Metrics related to rare events, like missed shots 
-or blocks, remain largely unchanged, indicating that shooting accuracy and occasional defensive 
-actions are less affected by the stage.
+Elite players defined as the top 10% in regular-season efficiency per minute
+tend to be able to maintain, their efficiency during the playoffs.
+This suggests that top performers are better able to sustain high-level production
+under increased competitive pressure.
 
 ```{python}
 # 1. Filtering for robust analysis (minimum playing time) 
@@ -931,12 +941,7 @@ summary_df = pd.DataFrame({
 summary_df
 ```
 
-**Elite players and playoff performance**
 
-Elite players defined as the top 10% in regular-season efficiency per minute
-tend to be able to maintain, their efficiency during the playoffs.
-This suggests that top performers are better able to sustain high-level production
-under increased competitive pressure.
 ```{python}
 elite_comparison \
     .sort_values(by='EFF_Differential', ascending=False) \
@@ -947,32 +952,9 @@ elite_comparison \
       'EFF_Differential']] \
     .round(4)
 ```
+Overview of the 5 players with the smallest EFF differential.  
 
-
-
-## What we discovered
-
-From our analysis, a few things stood out. We saw that height and experience don’t play the same role for everyone. For rather short players, having more experience becomes a key factor in their performance. This suggests that being tall gives an immediate advantage, whereas shorter players depend more on skill development and game understanding. 
-
-When looking at performance over age, we identified a clear peak around 27.4 years old, which makes sense: players are still in their physical prime but already have enough experience to make better decisions.
-
-We also noticed that player position explains a big part of the differences in EFF per minute. Interior players, so mainly Centers (C) and Power Forwards (PF), tend to show higher efficiency than perimeter players such as Small Forwards (SF), Shooting Guards (SG), and Point Guards (PG). This makes sense because players in inside positions are closer to the basket, take higher-percentage shots, and are more involved in rebounds and actions near the rim, which naturally boosts their efficiency.
-
-Another interesting pattern is that players who are still active at older ages usually have a very high EFF, which means that players have to be really good to stay in the league after a certain age. 
-
-Lastly, we compared Regular Season and Playoffs performances. We expected players to perform better in Playoffs because the games matter more, but what we observed is the opposite: almost everyone sees their EFF drop. The simplest explanation, besides higher pressure, is the increase in defensive intensity, as scoring becomes harder, mistakes are punished more, and efficiency tends to fall. Only two players in our dataset actually improved their EFF in the Playoffs; for all the others, it went down.
-
-# 5. Conclusion 
-
-## What we achieved 
-
-So far, we’ve been able to get a much clearer picture of what really affects NBA player performance. With the EDA and analysis, we spotted several interesting patterns, like how experience matters more for shorter players, how positions influence efficiency, when players usually hit their peak, and how performance changes from the regular season to the playoffs.
-
-We also started testing these ideas with some basic statistical models, mainly linear and polynomial regressions, to see if the trends hold when variables are analyzed together. This helped confirm most of what we saw in the data.
-
-Overall, we now have a good foundation and a better understanding of the main elements that shape a player’s performance, which sets us up well for the rest of the project.
-
-## Can we push further ?
+## Polynomial regressions
 
 ```{python}
 def compare_linear_polynomial(df, feature_col, target_col="EFF_per_min", degree=2, figsize=(8,5)):
@@ -980,7 +962,7 @@ def compare_linear_polynomial(df, feature_col, target_col="EFF_per_min", degree=
     Compare linear vs polynomial regression for a given feature against the target.
     
     Parameters
-    ----------
+
     df : pd.DataFrame
         Data containing feature and target columns.
     feature_col : str
@@ -993,7 +975,7 @@ def compare_linear_polynomial(df, feature_col, target_col="EFF_per_min", degree=
         Figure size for plotting.
     
     Returns
-    -------
+ 
     r2_lin : float
         R² of linear regression.
     r2_poly : float
@@ -1042,7 +1024,7 @@ def compare_linear_polynomial(df, feature_col, target_col="EFF_per_min", degree=
 
 ```
 
-
+We chose to compare linear regression with polynomial regression to determine if we could develop a more accurate prediction model.
 
 ```{python}
 # Compare wingspan vs EFF_per_min
@@ -1058,8 +1040,11 @@ r2_lin, r2_poly = compare_linear_polynomial(merged_NBA, "weight_anthro", degree=
 r2_lin, r2_poly = compare_linear_polynomial(merged_NBA, "height_anthro", degree=2)
 ```
 
+We noticed an interesting difference in the **R-squared** predictions for both wingspan and height. We can now proceed to perform a multifactor polynomial regression.
+
 ```{python}
-# Prepare data
+# Multilinear polynomial regression
+# prepare data
 df = merged_NBA.dropna(
     subset=["EFF_per_min", "height_anthro", "wingspan", "weight_anthro", "position"]
 ).copy()
@@ -1071,13 +1056,14 @@ y = df["EFF_per_min"].values
 
 print(f"Number of observations: {len(df)}")
 
-# Preprocessor:
-# - Polynomial terms for anthropometrics
-# - One-hot encoding for position
+# preprocessor: center anthropometrics and encode position
 preprocessor = ColumnTransformer([
     (
         "poly_features",
-        PolynomialFeatures(degree=2, include_bias=False),
+        Pipeline([
+            ("scaler", StandardScaler()),  # center numerical features
+            ("poly", PolynomialFeatures(degree=2, include_bias=False))
+        ]),
         ["height_anthro", "wingspan", "weight_anthro"]
     ),
     (
@@ -1087,36 +1073,29 @@ preprocessor = ColumnTransformer([
     )
 ])
 
-# Pipeline
+
+# Complete pipeline
 model = Pipeline([
     ("preprocessor", preprocessor),
     ("regression", LinearRegression())
 ])
 
-# Fit model
+# Fit the model
 model.fit(X, y)
 
-# Model fit
-y_pred = model.predict(X)
-r2 = r2_score(y, y_pred)
 
-# ============================
-# OLS output (interpretable)
-# ============================
+# Statsmodels OLS for interpretability
 
-# Get feature names
 feature_names = model.named_steps["preprocessor"].get_feature_names_out()
 feature_names_with_intercept = ["Intercept"] + list(feature_names)
 
-# Statsmodels OLS
 X_transformed = model.named_steps["preprocessor"].transform(X)
 X_sm = sm.add_constant(X_transformed)
 ols_model = sm.OLS(y, X_sm).fit()
 
-# Extract results table
+# Results as DataFrame
 df_results = ols_model.summary2().tables[1].copy()
 df_results.index = feature_names_with_intercept
-
 df_results.columns = [
     "Coefficient",
     "Std. Error",
@@ -1126,7 +1105,7 @@ df_results.columns = [
     "CI 97.5%"
 ]
 
-# Styling for Quarto
+
 def style_pvalue(val):
     if val < 0.05:
         return "background-color: #d4edda; color: #155724; font-weight: bold"
@@ -1139,44 +1118,62 @@ styled_table = (
     .map(style_pvalue, subset=["P-value"])
     .background_gradient(cmap="Blues", subset=["Coefficient"])
     .set_caption(
-        "📊 Polynomial Regression Results: Height, Wingspan, Weight, and Position"
+        "Polynomial Regression Results (Intercept = EFF of an average player)"
     )
 )
 
 display(styled_table)
-
 ```
-The intercept should not be interpreted as a realistic performance level, as it corresponds to a hypothetical player with zero height, wingspan, and weight. In this polynomial regression, the intercept primarily serves as a mathematical anchor that allows the model to fit non-linear relationships within the realistic range of NBA player characteristics.
+
+We created a centered polynomial regression model so that the intercept represents an average player with a predicted `EFF_per_min` of 0.42. This allows us to interpret the coefficients relative to a typical player. The model includes quadratic and interaction terms, which highlight subtle effects, such as the positive quadratic effect of wingspan and the interaction between wingspan and weight. These terms help identify how combinations of physical measurements influence efficiency beyond simple linear effects.
+
+## Theoretical performance model
+
+To ensure anthropometric realism in the optimization procedure, wingspan is not treated as an independent variable. Instead, it is modeled as a deterministic function of height, using the average wingspan-to-height ratio observed in the NBA. In addition, player weight is constrained using a BMI-based plausibility range, ensuring that only realistic height–weight combinations are considered. Together, these constraints reflect biological proportionality and prevent the model from selecting physically implausible player profiles. The resulting optimal player therefore represents a realistic combination of height, weight, and position rather than a purely statistical extreme. But it should not be interpreted as a real or achievable player type, but rather as a statistical illustration of how physical attributes interact within the model under realistic constraints.
 
 ```{python}
+# Average NBA wingspan-to-height ratio
+ws_height_ratio = (df["wingspan"] / df["height_anthro"]).mean()
 
-# Define realistic ranges using percentiles
-height_min, height_max = df["height_anthro"].quantile([0.05, 0.95])
-wingspan_min, wingspan_max = df["wingspan"].quantile([0.05, 0.95])
+# Extended realistic ranges (NBA plausible extremes)
+height_range = np.linspace(175, 245, 60)      # allow very tall players
+weight_range = np.linspace(65, 160, 50)       # include very heavy centers
 positions = df["position_simple"].unique()
 
-height_range = np.linspace(height_min, height_max, 30)
-wingspan_range = np.linspace(wingspan_min, wingspan_max, 30)
-
-# Grid search with constraints: wingspan >= height
 best_eff = -np.inf
 best_player = {}
 
-for h, w, pos in product(height_range, wingspan_range, positions):
-    if w < h:  # skip unrealistic wingspan
+for h, wt, pos in product(height_range, weight_range, positions):
+
+    # Wingspan proportional to height
+    w = h * ws_height_ratio
+
+    # BMI-like plausibility constraint
+    bmi_like = wt / (h / 100) ** 2
+    if bmi_like < 18 or bmi_like > 35:
         continue
+
     X_test = pd.DataFrame({
         "height_anthro": [h],
         "wingspan": [w],
+        "weight_anthro": [wt],
         "position_simple": [pos]
     })
+
     y_pred = model.predict(X_test)[0]
+
     if y_pred > best_eff:
         best_eff = y_pred
-        best_player = {"height": h, "wingspan": w, "position": pos, "predicted_EFF_per_min": best_eff}
+        best_player = {
+            "height": h,
+            "wingspan": w,
+            "weight": wt,
+            "position": pos,
+            "predicted_EFF_per_min": y_pred
+        }
 
-# Display the “optimal player”
-print("Realistic Theoretical Optimal Player to Maximize EFF_per_min")
+# Display result
+print("Extended Theoretical Optimal Player (NBA-Plausible)")
 for k, v in best_player.items():
     if isinstance(v, float):
         print(f"{k}: {v:.2f}")
@@ -1185,67 +1182,109 @@ for k, v in best_player.items():
 
 
 ```
-This cell uses the previously fitted regression model to identify a theoretical “optimal player” who would maximize EFF_per_min. It searches across realistic ranges of height and wingspan and considers each position. The result highlights the combination of attributes predicted to achieve the highest efficiency per minute according to the model.
+
+We modeled the resulting surface, which isolates the combined effect of height and weight on efficiency while preserving realistic body proportions. As we can see, there is an optimal point around **110 kg** for the tallest measurements allowed.
 
 ```{python}
-# Define realistic ranges (same as in the optimal player search)
-height_min, height_max = df["height_anthro"].quantile([0.05, 0.95])
-wingspan_min, wingspan_max = df["wingspan"].quantile([0.05, 0.95])
-positions = df["position_simple"].unique()
+# Compute average wingspan-to-height ratio in NBA
+ws_height_ratio = (df["wingspan"] / df["height_anthro"]).mean()
 
-height_range = np.linspace(height_min, height_max, 30)
-wingspan_range = np.linspace(wingspan_min, wingspan_max, 30)
+print(f"Average NBA wingspan-to-height ratio: {ws_height_ratio:.3f}")
 
-# Compute EFF_per_min surface for a fixed position (e.g., PG)
-position_fixed = best_player["position"]  # use previously found optimal position
-EFF_values = np.zeros((len(height_range), len(wingspan_range)))
+# Define realistic ranges
+
+height_range = np.linspace(175, 245, 60)
+weight_range = np.linspace(65, 160, 50)
+
+# Fix position
+position_fixed = best_player["position"]
+
+EFF_values = np.zeros((len(height_range), len(weight_range)))
 
 for i, h in enumerate(height_range):
-    for j, w in enumerate(wingspan_range):
-        if w < h:  # skip unrealistic
-            EFF_values[i, j] = np.nan
-        else:
-            X_test = pd.DataFrame({
-                "height_anthro": [h],
-                "wingspan": [w],
-                "position_simple": [position_fixed]
-            })
-            EFF_values[i, j] = model.predict(X_test)[0]
+    for j, wt in enumerate(weight_range):
 
-# Create interactive 3D surface plot
+        # Compute wingspan as a function of height
+        wingspan = h * ws_height_ratio
+
+        # BMI-like plausibility constraint
+        bmi_like = wt / (h / 100) ** 2
+        if bmi_like < 18 or bmi_like > 35:
+            EFF_values[i, j] = np.nan
+            continue
+
+        X_test = pd.DataFrame({
+            "height_anthro": [h],
+            "wingspan": [wingspan],
+            "weight_anthro": [wt],
+            "position_simple": [position_fixed]
+        })
+
+        EFF_values[i, j] = model.predict(X_test)[0]
+
+# find optimal point
+max_idx = np.nanargmax(EFF_values)  # ignore les NaN
+max_i, max_j = np.unravel_index(max_idx, EFF_values.shape)
+optimal_height = height_range[max_i]
+optimal_weight = weight_range[max_j]
+optimal_EFF = EFF_values[max_i, max_j]
+
+# Plot surface
 fig = go.Figure(data=[go.Surface(
     z=EFF_values,
-    x=height_range,
-    y=wingspan_range,
+    x=weight_range,
+    y=height_range,
     colorscale='Viridis',
-    colorbar=dict(title='Predicted EFF_per_min'),
-    cmin=np.nanmin(EFF_values),
-    cmax=np.nanmax(EFF_values)
+    colorbar=dict(title='Predicted EFF_per_min')
 )])
 
-# Add optimal player marker
-fig.add_trace(go.Scatter3d(
-    x=[best_player["height"]],
-    y=[best_player["wingspan"]],
-    z=[best_player["predicted_EFF_per_min"]],
-    mode='markers+text',
-    marker=dict(size=5, color='red'),
-    text=["Optimal Player"],
-    textposition="top center"
-))
-
 fig.update_layout(
-    title=f"EFF_per_min Surface (Position={position_fixed})",
+    title=f"EFF_per_min Surface (Height × Weight, Wingspan ≈ Height, Position={position_fixed})",
     scene=dict(
-        xaxis_title='Height (cm)',
-        yaxis_title='Wingspan (cm)',
+        xaxis_title='Weight (kg)',
+        yaxis_title='Height (cm)',
         zaxis_title='Predicted EFF_per_min'
     ),
-    autosize=True,
     width=800,
     height=600
 )
 
+# add the optimal point in red
+fig.add_trace(go.Scatter3d(
+    x=[optimal_weight],
+    y=[optimal_height],
+    z=[optimal_EFF],
+    mode='markers',
+    marker=dict(size=5, color='red')
+))
+
 fig.show()
 ```
-This 3D interactive plot shows how EFF_per_min changes with height and wingspan for a fixed position (the optimal one). The red point marks the theoretical “optimal player” found in the previous step. The surface illustrates realistic ranges and highlights where efficiency peaks within plausible anthropometric combinations.
+
+## What we discovered
+
+From our analysis, a few things stood out. We saw that height and experience don’t play the same role for everyone. For rather short players, having more experience becomes a key factor in their performance. This suggests that being tall gives an immediate advantage, whereas shorter players depend more on skill development and game understanding. 
+
+When looking at performance over age, we identified a clear peak around 27.4 years old, which makes sense: players are still in their physical prime but already have enough experience to make better decisions. Another interesting pattern is that players who remain active at older ages usually display high EFF values. This is likely driven by a survivorship effect: only the most efficient players are able to stay in the league as they age.
+
+We also noticed that player position explains a big part of the differences in EFF per minute. Interior players, so mainly Centers (C) and Power Forwards (PF), tend to show higher efficiency than perimeter players such as Small Forwards (SF), Shooting Guards (SG), and Point Guards (PG). This makes sense because players in inside positions are closer to the basket, take higher-percentage shots, and are more involved in rebounds and actions near the rim, which naturally boosts their efficiency.
+
+Another interesting pattern is that players who are still active at older ages usually have a very high EFF, which means that players have to be really good to stay in the league after a certain age. 
+
+We then compared Regular Season and Playoffs performances. We expected players to perform better in Playoffs because the games matter more, but what we observed is the opposite: almost everyone sees their EFF drop. The simplest explanation, besides higher pressure, is the increase in defensive intensity, as scoring becomes harder, mistakes are punished more, and efficiency tends to fall. Only two players in our dataset actually improved their EFF in the Playoffs; for all the others, it went down.
+
+Lastly, we used a centered polynomial regression to better understand how players’ physical characteristics and positions relate to efficiency per minute. By focusing on an average player, this approach allowed us to interpret the results more intuitively. The model shows that wingspan and weight are the most relevant physical factors, with some non-linear effects, while height alone plays a more limited role. Position also remains important, as point guards and power forwards tend to display slightly higher efficiency compared to other roles. Overall, this analysis complements our earlier findings by showing how physical attributes and positional roles help explain differences in performance beyond age and experience.
+
+# 5. Conclusion 
+
+## Summary of main findings
+
+In this project, we analyzed NBA player performance using physical attributes, age, position, and efficiency per minute metrics. Our results show that physical characteristics such as height, weight, and especially wingspan are positively related to efficiency per minute, although their explanatory power remains limited. We also identified a clear performance peak around 27.4 years old, which reflects the balance between physical prime and accumulated experience. In addition, player position plays a major role in explaining differences in efficiency, with interior players generally displaying higher `EFF_per_min`than perimeter players.
+
+## Practical implications
+
+From a practical perspective, our findings suggest that physical attributes should be seen as advantages rather than guarantees of high performance. While being taller or heavier can improve efficiency on average, these factors alone cannot fully explain why some players perform better than others. The comparison between Regular Season and Playoffs also highlights the importance of context: most players experience a drop in efficiency during the Playoffs, while elite players tend to maintain more stable performance under pressure. This suggests that consistency and adaptability are key traits that may not be fully captured by standard physical or box-score metrics.
+
+## Limitations and future research
+
+Despite these insights, our analysis is limited by the available data. We focused mainly on anthropometric variables and basic performance statistics, which do not capture important aspects such as athletic testing results, tactical roles, or psychological factors. Future research could integrate combine data such as speed, vertical jump, or agility, as well as tracking data related to movement and workload. Using more advanced longitudinal models could also help better understand player development over time and improve the prediction of long-term performance.
