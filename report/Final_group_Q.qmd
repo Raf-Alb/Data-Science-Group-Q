@@ -1,8 +1,6 @@
 ---
 title: "Determinants of Basketball Player Performance: A Physical-Attributes Approach"
-author: |
-  Group Q: Dolindo Allegri, Rafael Alves Albuquerque \newline
-  Jean-Paul Fahmy, Alexander Salmeron Vasylenko
+author: "Dolindo Allegri, Rafael Alves Albuquerque, Jean-Paul Fahmy, Alexander Salmeron Vasylenko"
 date: today
 bibliography: references.bib
 format:
