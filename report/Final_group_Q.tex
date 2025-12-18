@@ -1,0 +1,967 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Determinants of Basketball Player Performance: A Physical-Attributes Approach},
+  pdfauthor={Group Q: ~Dolindo Allegri, Rafael Alves Albuquerque ~Jean-Paul Fahmy, Alexander Salmeron Vasylenko},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Determinants of Basketball Player Performance: A
+Physical-Attributes Approach}
+\author{Group Q: ~Dolindo Allegri, Rafael Alves Albuquerque ~Jean-Paul
+Fahmy, Alexander Salmeron Vasylenko}
+\date{2025-12-18}
+\begin{document}
+\maketitle
+
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+
+\section{Introduction}\label{introduction}
+
+The goal of this project is to analyze basketball player performance and
+identify the factors that most influence it. Specifically, we focus on
+NBA players, using detailed player statistics and physical attributes to
+explore performance trends and build predictive models. This project
+anchors itself in the high-stakes reality of modern sports management.
+In a multi-billion dollar industry where recruitment errors are costly,
+General Managers and scouts increasingly rely on data to move beyond the
+traditional ``eye test.'' Our analysis aims to provide actionable
+insights for optimizing roster construction and contract negotiations.
+
+Our research questions are centered on identifying which variables are
+most predictive of performance. In particular, we aim to understand how
+players and their performances evolve over time, how physical
+characteristics influence effectiveness, and which metrics best predict
+scoring and overall contribution to the game. In addition, we develop a
+predictive model designed to identify the combination of player features
+that leads to optimal efficiency.
+
+This project builds on our original proposal by incorporating a broader
+dataset covering 49 leagues and over 11,000 players from 1999 to 2020.
+The dataset includes detailed performance statistics, contextual
+information (league, season, stage), biometric data (height, weight,
+birth year), and background information (draft, high school,
+nationality). Our initial focus was on exploratory data analysis (EDA)
+to understand the structure and key features of the data. After
+reviewing the dataset, we refined our approach to include both EDA and
+predictive modeling, allowing us to quantify relationships between
+variables and estimate future player performance.
+
+\section{Data}\label{data}
+
+\subsection{Data sources}\label{data-sources}
+
+Our project uses two primary datasets found on kaggle.com:
+
+players\_stats\_by\_season\_full\_details.xlsx (Baruch 2023), which
+covers professional basketball seasons from 1999 to 2020 across 49
+leagues, representing around 11,000 players. It contains detailed
+information such as birth dates, height, weight, nationality, and high
+school background, along with comprehensive season statistics (points,
+rebounds, assists, shooting percentages, minutes, games played, and
+more). This dataset offers much more than raw numbers: it provides a
+broad view of global player performance over more than two decades,
+making it a strong foundation for comparative and longitudinal analysis.
+
+NBA\_Anthropometric.csv (Dobrucki 2023), which contains anthropometric
+measurements from NBA Draft Combine events held between 2000 and 2023.
+The NBA Draft Combine is a yearly showcase where invited prospects
+undergo physical testing, medical exams, athletic drills, shooting
+evaluations, and five-on-five scrimmages in front of NBA coaches,
+general managers, and scouts. But this file includes only a limited set
+of physical measurements (height, weight, wingspan, arm length, etc.)
+converted from imperial to metric units, representing just a small part
+of all data collected at the Combine. The data was originally obtained
+through the NBA Stats API and converted from imperial to metric units.
+
+Both datasets were loaded into Python and inspected to understand their
+structure.
+
+\phantomsection\label{setup}
+\begin{verbatim}
+Data loaded successfully.
+\end{verbatim}
+
+\subsection{Data cleaning and
+pre-processing}\label{data-cleaning-and-pre-processing}
+
+The two datasets did not perfectly match (different naming formats,
+missing players, duplicates). As a first step, we identified and kept
+only the players present in both datasets.
+
+\phantomsection\label{merging-data}
+\begin{verbatim}
+Merged rows: 6366
+\end{verbatim}
+
+We also ensured consistent player identification across both sources by
+normalizing the player name fields and comparing unique values, which
+prevented duplicated entries and guaranteed that each player-season
+appears only once in the final dataset. In addition, several columns
+(e.g., height\_stats, birth\_month, birth\_year, player\_name,
+height\_cm) were removed because they were either duplicated across
+datasets, irrelevant for performance modeling, inconsistent, or missing
+for many players.
+
+We also addressed inconsistencies in date formats within the birth\_date
+column to enable precise age calculations. Since many players appear in
+the dataset across multiple seasons, relying on a static age would be
+inaccurate. We therefore calculated a dynamic age for each season entry
+by computing the time difference between the player's normalized birth
+date and the start of that specific season (fixed at October 1st). This
+step was crucial for correctly analyzing the ``aging curve'' and
+performance evolution throughout a player's career.
+
+To make players comparable despite differences in playing time, we
+normalized all box-score statistics on a per-minute basis. This step was
+necessary because raw totals (e.g., points, rebounds, assists) are
+heavily influenced by the number of minutes a player spends on the
+court. By creating variables such as \texttt{PTS\_per\_min},
+\texttt{REB\_per\_min}, \texttt{AST\_per\_min}, and all other equivalent
+per-minute metrics, we ensured that the analysis reflected true
+performance intensity rather than total playing time.
+
+To evaluate overall performance, we adopted the standard NBA Efficiency
+(EFF)(Captain Calculator 2025) metric but normalized it to a per-minute
+basis. While standard per-game EFF scores typically range from 10 to 30,
+our resulting \texttt{EFF\_per\_min} metric scales down to a range of 0
+to 1.5 . The metric is calculated by summing a player's positive
+contributions (points, rebounds, assists, steals, blocks) and
+subtracting the negative ones (missed shots, missed free throws, and
+turnovers), all divided by minutes played. To interpret this scale: a
+value of 0.5 EFF/min represents a solid rotation player, while anything
+\textgreater1.0 EFF/min indicates elite, MVP-level productivity.
+
+\begin{verbatim}
+Colonnes créées : ['FGM_per_min', 'FGA_per_min', '3PM_per_min', '3PA_per_min', 'FTM_per_min', 'FTA_per_min', 'TOV_per_min', 'PF_per_min', 'ORB_per_min', 'DRB_per_min', 'REB_per_min', 'AST_per_min', 'STL_per_min', 'BLK_per_min', 'PTS_per_min']
+\end{verbatim}
+
+The \texttt{position} column often contains dual entries (e.g.,
+``SF/SG''). We chose to keep only the \textbf{first position} listed. In
+basketball reporting, the first position typically indicates the
+player's primary defensive assignment and offensive role, while the
+second indicates secondary versatility. Simplifying to the primary role
+allows for clearer categorical analysis.
+
+For the remainder of this project, the analysis focuses exclusively on
+the NBA. This choice is motivated by the league's consistent level of
+competition, standardized rules, and high-quality data availability.
+Restricting the scope to the NBA allows for more reliable comparisons
+between players and seasons, while reducing variability introduced by
+differences across leagues.
+
+\subsection{Main challenges}\label{main-challenges}
+
+The main challenges were merging the two datasets and eliminating
+duplicate columns. We considered integrating the teams each player
+played for, but creating dummy variables for all teams made the system
+cumbersome and difficult to use. Beyond the technical complexity,
+integrating the teams is particularly irrelevant in our case. We don't
+have a complete sample of players for each team, and we don't know
+precisely when players play together during~the~season.
+
+\section{Exploratory Data Analysis
+(EDA)}\label{exploratory-data-analysis-eda}
+
+\subsection{Summary statistics}\label{summary-statistics}
+
+We began our analysis by examining player physical characteristics,
+focusing first on height, weight, age at the start of the season, and
+EFF per minute. Using histograms and boxplots (considering each player
+only once), we explored the distribution of these stats among all
+players in the dataset. Summary statistics indicated the average,
+median, standard deviation, and interquartile range of for each player,
+while extreme values were flagged as potential outliers. This step
+allowed us to identify unusual or inconsistent entries and better
+understand the baseline characteristics of our population.
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-10-output-1.pdf}}
+
+\begin{verbatim}
+HEIGHT_ANTHRO — Count: 497, Mean: 197.2 cm, Median: 197.5 cm, Std: 8.4, IQR: 11.4
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-11-output-1.pdf}}
+
+\begin{verbatim}
+WEIGHT_ANTHRO — Count: 496, Mean: 97.6 kg, Median: 97.8 kg, Std: 11.4, IQR: 15.9
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-12-output-1.pdf}}
+
+\begin{verbatim}
+AGE_DEBUT_SAISON — Count: 3603, Mean: 26.1 years, Median: 25.6 years, Std: 3.6, IQR: 5.2
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-13-output-1.pdf}}
+
+\begin{verbatim}
+EFF_PER_MIN — Count: 3603, Mean: 0.5 performance, Median: 0.5 performance, Std: 0.1, IQR: 0.2
+\end{verbatim}
+
+Here we visualize the target variable \texttt{EFF\_per\_min}. As
+explained in the preprocessing, the values are small. The distribution
+is somewhat normal but with a right skew. Which indicates that
+``superstar'' productivity is rare. Most players cluster around the
+0.4-0.6 range.
+
+We also analyzed how player performance changes with age by looking at
+per-minute efficiency for players who played multiple seasons. Using a
+polynomial trend line, we were able to see the general evolution of
+performance across a career and identify the age at which players
+typically reach their peak. This analysis is important because it shows
+not just individual variation but the overall pattern of development and
+decline, helping us understand typical career trajectories in the NBA.
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-14-output-1.pdf}}
+
+\subsection{Key findings}\label{key-findings}
+
+First, the distributions of height, weight, and age confirmed the
+expected structure of an NBA population: players are generally very
+tall, with most heights clustered around similar ranges, and age is
+centered around the mid-20s. The boxplots also helped us spot a few
+outliers in height and weight, which could indicate unusual player
+profiles or data inconsistencies.
+
+When looking at efficiency across ages, the curve we plotted showed a
+clear performance peak at around 27.4 years old. This aligns with the
+idea that players combine both physical prime and solid experience at
+that age. Before that, efficiency tends to increase gradually as players
+develop, and after the peak, we observed a slow decline that matches the
+natural physical aging curve. Even though this is just a broad trend, it
+gives a first impression of how career progression typically looks in
+the NBA.
+
+\section{Analysis}\label{analysis}
+
+For the analysis, we focused on a few statistical models to better
+understand which factors actually drive player performance. We mainly
+used simple and multiple linear regressions to see how variables like
+height, weight, wingspan, age, and position relate to
+\texttt{EFF\_per\_min} when looked at together. These models help us go
+beyond basic trends from the EDA and test whether the patterns we saw
+still hold once variables are combined.
+
+In a second step, we introduced polynomial regressions to capture
+potential non-linear effects between physical attributes and
+performance. Finally, we built a predictive model that combines
+anthropometric variables and player position to estimate efficiency per
+minute and explore theoretical optimal player profiles under realistic
+physical constraints.
+
+\subsection{Simple linear regressions}\label{simple-linear-regressions}
+
+After that, we explored the relationship between player attributes and
+performance using simple linear regression models. Specifically, we
+regressed \texttt{EFF\_per\_min} on individual physical or demographic
+variables, such as height. This approach allowed us to quantify how each
+attribute influences overall efficiency per minute and to assess the
+statistical significance of the effect. For example, regressing
+efficiency on height helped determine whether taller players tend to be
+more effective on a per-minute basis. By running these regressions for
+several key variables, we identified which attributes are significant
+predictors of performance and which have little to no measurable effect.
+
+\begin{verbatim}
+Linear Regression
+Dependent Variable : EFF_per_min
+Explicatives Variables : height_anthro
+\end{verbatim}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Coefficient & Std. Error & p-value & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const & -0.314 & 0.053 & 0.0 & *** \\
+height\_anthro & 0.004 & 0.0 & 0.0 & *** \\
+& & & & \\
+R-squared & 0.056 & & & \\
+Observations & 3588 & & & \\
+\end{longtable}
+
+The regression shows a positive and statistically significant effect of
+height on efficiency per minute, with an estimated coefficient of 0.004
+(p \textless{} 0.001), but the model has low explanatory power, with an
+R-squared of 0.056 (N = 3,588).
+
+\begin{verbatim}
+Linear Regression
+Dependent Variable : EFF_per_min
+Explicatives Variables : wingspan
+\end{verbatim}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Coefficient & Std. Error & p-value & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const & -0.396 & 0.046 & 0.0 & *** \\
+wingspan & 0.004 & 0.0 & 0.0 & *** \\
+& & & & \\
+R-squared & 0.090 & & & \\
+Observations & 3593 & & & \\
+\end{longtable}
+
+The regression shows a positive and statistically significant effect of
+wingspan on efficiency per minute, with an estimated coefficient of
+0.004 (p \textless{} 0.001), but the model has limited explanatory
+power, with an R-squared of 0.090 (N = 3,593).
+
+\begin{verbatim}
+Linear Regression
+Dependent Variable : EFF_per_min
+Explicatives Variables : weight_anthro
+\end{verbatim}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Coefficient & Std. Error & p-value & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const & 0.16 & 0.019 & 0.0 & *** \\
+weight\_anthro & 0.003 & 0.0 & 0.0 & *** \\
+& & & & \\
+R-squared & 0.064 & & & \\
+Observations & 3586 & & & \\
+\end{longtable}
+
+The regression shows a positive and statistically significant effect of
+weight on efficiency per minute, with an estimated coefficient of 0.003
+(p \textless{} 0.001), but the model has low explanatory power, with an
+R-squared of 0.064 (N = 3,586).
+
+\begin{verbatim}
+Linear Regression
+Dependent Variable : EFF_per_min
+Explicatives Variables : age_debut_saison
+\end{verbatim}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Coefficient & Std. Error & p-value & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+const & 0.457 & 0.017 & 0.0 & *** \\
+age\_debut\_saison & 0.0 & 0.001 & 0.859 & \\
+& & & & \\
+R-squared & 0.000 & & & \\
+Observations & 3603 & & & \\
+\end{longtable}
+
+The regression shows that age at season debut has no statistically
+significant effect on the dependent variable (p = 0.859), and the model
+has virtually no explanatory power, with an R-squared close to zero,
+despite a large sample size (N = 3,603).
+
+\subsection{Multiple linear
+regressions}\label{multiple-linear-regressions}
+
+After analyzing individual variables with simple regressions, we then
+performed multiple linear regressions to see how these factors together
+influence scoring efficiency. For example, we modeled
+\texttt{EFF\_per\_min} as a function of height, weight, age, and the
+interaction between height and age. We did that including the position
+of the player as well, which influences quite a lot how much a player
+scores, since different positions have different typical roles and
+responsibilities on the court.
+
+\begin{verbatim}
+ Multiple Linear Regression Results (EFF_per_min vs Player Profile) 
+Model: EFF_per_min = B0 + B1*Height + B2*Weight + B3*Age + B4*(Height * Age)
+\end{verbatim}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Coefficient & Std. Error & p-value & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept & -0.657 & 0.471 & 0.163 & \\
+height\_anthro & 0.005 & 0.002 & 0.06 & * \\
+weight\_anthro & 0.002 & 0.0 & 0.0 & *** \\
+age\_debut\_saison & 0.02 & 0.018 & 0.263 & \\
+height\_anthro:age\_debut\_saison & -0.0 & 0.0 & 0.309 & \\
+& & & & \\
+R-squared & 0.088 & & & \\
+Observations & 2251 & & & \\
+\end{longtable}
+
+The first model, which excludes player position, shows that both height
+and weight are significant predictors, with positive coefficients
+suggesting that taller and heavier players tend to have higher
+efficiency per minute (\texttt{EFF\_per\_min}). However, Age and its
+interaction with height are found to be statistically insignificant.
+This model only accounts for a small amount of the variance in
+efficiency, as indicated by a low \textbf{R-squared} of \textbf{0.088}.
+
+\begin{verbatim}
+ Multiple Linear Regression Results (EFF_per_min vs Player Profile + Position) 
+Model: EFF_per_min = f(Height, Weight, Age, Height * Age, Position)
+\end{verbatim}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Coefficient & Std. Error & p-value & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept & -0.461 & 0.469 & 0.327 & \\
+C(Simplified\_Position){[}T.PF{]} & -0.022 & 0.011 & 0.048 & ** \\
+C(Simplified\_Position){[}T.PG{]} & -0.011 & 0.021 & 0.609 & \\
+C(Simplified\_Position){[}T.SF{]} & -0.084 & 0.013 & 0.0 & *** \\
+C(Simplified\_Position){[}T.SG{]} & -0.084 & 0.016 & 0.0 & *** \\
+height\_anthro & 0.004 & 0.002 & 0.091 & * \\
+weight\_anthro & 0.001 & 0.0 & 0.0 & *** \\
+age\_debut\_saison & 0.013 & 0.017 & 0.468 & \\
+height\_anthro:age\_debut\_saison & -0.0 & 0.0 & 0.548 & \\
+& & & & \\
+R-squared & 0.160 & & & \\
+Observations & 2251 & & & \\
+\end{longtable}
+
+The second, more powerful model (with \textbf{R-squared}=\textbf{0.160})
+confirms that Position is a major determinant of efficiency. The
+significant and negative coefficients for PF, SF, and SG (relative to
+the unlisted reference position C) indicate that these positions
+typically have lower \texttt{EFF\_per\_min}.\\
+Although the exploratory analysis suggests a clear age-related
+performance pattern, age is not statistically significant in the
+multiple regression models once physical attributes and position are
+controlled for. This indicates that age captures broad career trends
+rather than a direct effect on efficiency per minute.
+
+\subsection{Regular season vs
+playoffs}\label{regular-season-vs-playoffs}
+
+We finally compared performance in the regular season with that in the
+playoffs. This comparison is particularly important because playoffs
+games carry higher stakes: players are expected to perform at their
+best, yet they also face greater pressure.
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{figures/performance_evolution_by_age.png}}
+
+}
+
+\caption{Regular Season Performance}
+
+\end{figure}%
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{figures/performance_evolution_by_age_playoffs.png}}
+
+}
+
+\caption{Playoffs Performance}
+
+\end{figure}%
+
+\textbf{Regular season vs.~playoffs performance}
+
+Overall, players exhibit reduced offensive efficiency in the playoffs.
+Declines in points, assists, and overall efficiency suggest that the
+heightened defensive intensity and pressure of postseason competition
+limit scoring opportunities and offensive flow. Defensive metrics, such
+as steals and rebounds, also decrease slightly, reflecting the more
+physical and strategic nature of playoffs games. Metrics related to rare
+events, like missed shots or blocks, remain largely unchanged,
+indicating that shooting accuracy and occasional defensive actions are
+less affected by the stage.
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule\noalign{}
+& Metric & Regular Season Mean & Playoffs Mean & Mean Diff (PO - RS) &
+p-value & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Assists per Min (Offense) & 0.0886 & 0.0802 & -0.0084 & 0.0000 &
+*** \\
+3 & Efficiency per Min (Overall) & 0.4771 & 0.4454 & -0.0317 & 0.0000 &
+*** \\
+6 & Turnovers per Min (Negative) & 0.0556 & 0.0525 & -0.0031 & 0.0005 &
+*** \\
+0 & Points per Min (Offense) & 0.4252 & 0.4079 & -0.0173 & 0.0006 &
+*** \\
+4 & Steals per Min (Defense) & 0.0317 & 0.0299 & -0.0018 & 0.0008 &
+*** \\
+2 & Rebounds per Min (Offense) & 0.1773 & 0.1704 & -0.0070 & 0.0177 &
+** \\
+8 & Missed FTs per Min (Negative) & 0.0238 & 0.0250 & 0.0012 & 0.1325
+& \\
+5 & Blocks per Min (Defense) & 0.0201 & 0.0195 & -0.0006 & 0.4234 & \\
+7 & Missed FGs per Min (Negative) & 0.1864 & 0.1850 & -0.0014 & 0.5542
+& \\
+\end{longtable}
+
+\textbf{Elite players and playoffs performance}
+
+Elite players defined as the top 10\% in regular-season efficiency per
+minute tend to be able to maintain, their efficiency during the
+playoffs. This suggests that top performers are better able to sustain
+high-level production under increased competitive pressure.
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& Metric & Value \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & Elite threshold (90th percentile, Reg. Season) & 0.6094 \\
+1 & Number of elite players & 49.0000 \\
+2 & Avg EFF/min (Reg. Season, Elite) & 0.6843 \\
+3 & Avg EFF/min (Playoffs, Elite) & 0.6081 \\
+4 & Avg differential (Playoffs − Reg. Season) & -0.0762 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+Stage & Player & Avg\_EFF\_Reg\_Season\_Full & Avg\_EFF\_Playoffs\_Full
+& EFF\_Differential \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+221 & Jarrett Allen & 0.6600 & 0.7400 & 0.0800 \\
+181 & Greg Monroe & 0.6286 & 0.6450 & 0.0164 \\
+279 & Kawhi Leonard & 0.6662 & 0.6725 & 0.0062 \\
+306 & LeBron James & 0.7582 & 0.7493 & -0.0089 \\
+200 & JaVale McGee & 0.6812 & 0.6680 & -0.0133 \\
+\end{longtable}
+
+Overview of the 5 players with the smallest EFF differential.
+
+\subsection{Polynomial regressions}\label{polynomial-regressions}
+
+We chose to compare linear regression with polynomial regression to
+determine if we could develop a more accurate prediction model.
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-29-output-1.pdf}}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-30-output-1.pdf}}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Final_group_Q_files/figure-pdf/cell-31-output-1.pdf}}
+
+We noticed an interesting difference in the \textbf{R-squared}
+predictions for both wingspan and height. We can now proceed to perform
+a multifactor polynomial regression.
+
+\begin{verbatim}
+Number of observations: 3575
+\end{verbatim}
+
+\begin{longtable}[]{@{}lllllll@{}}
+\caption{Polynomial Regression Results (Intercept = EFF of an average
+player)}\label{T_983ac}\tabularnewline
+\toprule\noalign{}
+~ & Coefficient & Std. Error & t-statistic & P-value & CI 2.5\% & CI
+97.5\% \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+~ & Coefficient & Std. Error & t-statistic & P-value & CI 2.5\% & CI
+97.5\% \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept & 0.4200 & 0.0152 & 27.6134 & 0.0000 & 0.3902 & 0.4498 \\
+poly\_features\_\_height\_anthro & 0.0021 & 0.0054 & 0.3899 & 0.6967 &
+-0.0084 & 0.0126 \\
+poly\_features\_\_wingspan & 0.0412 & 0.0043 & 9.6292 & 0.0000 & 0.0328
+& 0.0496 \\
+poly\_features\_\_weight\_anthro & 0.0226 & 0.0041 & 5.4879 & 0.0000 &
+0.0145 & 0.0307 \\
+poly\_features\_\_height\_anthro\^{}2 & 0.0025 & 0.0060 & 0.4138 &
+0.6791 & -0.0093 & 0.0143 \\
+poly\_features\_\_height\_anthro wingspan & 0.0005 & 0.0100 & 0.0509 &
+0.9594 & -0.0192 & 0.0202 \\
+poly\_features\_\_height\_anthro weight\_anthro & 0.0114 & 0.0073 &
+1.5504 & 0.1211 & -0.0030 & 0.0257 \\
+poly\_features\_\_wingspan\^{}2 & 0.0216 & 0.0062 & 3.4897 & 0.0005 &
+0.0095 & 0.0338 \\
+poly\_features\_\_wingspan weight\_anthro & -0.0177 & 0.0077 & -2.3017 &
+0.0214 & -0.0327 & -0.0026 \\
+poly\_features\_\_weight\_anthro\^{}2 & -0.0026 & 0.0037 & -0.7133 &
+0.4757 & -0.0098 & 0.0046 \\
+position\_simple\_\_position\_simple\_PF & 0.0266 & 0.0113 & 2.3607 &
+0.0183 & 0.0045 & 0.0487 \\
+position\_simple\_\_position\_simple\_PG & 0.0701 & 0.0192 & 3.6566 &
+0.0003 & 0.0325 & 0.1077 \\
+position\_simple\_\_position\_simple\_SF & -0.0050 & 0.0143 & -0.3485 &
+0.7275 & -0.0329 & 0.0230 \\
+position\_simple\_\_position\_simple\_SG & 0.0033 & 0.0169 & 0.1924 &
+0.8475 & -0.0300 & 0.0365 \\
+\end{longtable}
+
+We created a centered polynomial regression model so that the intercept
+represents an average player with a predicted \texttt{EFF\_per\_min} of
+0.42. This allows us to interpret the coefficients relative to a typical
+player. The model includes quadratic and interaction terms, which
+highlight subtle effects, such as the positive quadratic effect of
+wingspan and the interaction between wingspan and weight. These terms
+help identify how combinations of physical measurements influence
+efficiency beyond simple linear effects.
+
+\subsection{Theoretical performance
+model}\label{theoretical-performance-model}
+
+To ensure anthropometric realism in the optimization procedure, wingspan
+is not treated as an independent variable. Instead, it is modeled as a
+deterministic function of height, using the average wingspan-to-height
+ratio observed in the NBA. In addition, player weight is constrained
+using a BMI-based plausibility range, ensuring that only realistic
+height--weight combinations are considered. Together, these constraints
+reflect biological proportionality and prevent the model from selecting
+physically implausible player profiles. The resulting optimal player
+therefore represents a realistic combination of height, weight, and
+position rather than a purely statistical extreme. But it should not be
+interpreted as a real or achievable player type, but rather as a
+statistical illustration of how physical attributes interact within the
+model under realistic constraints.
+
+\begin{verbatim}
+Extended Theoretical Optimal Player (NBA-Plausible)
+height: 235.00
+wingspan: 249.74
+weight: 107.65
+position: PG
+predicted_EFF_per_min: 1.07
+\end{verbatim}
+
+We modeled the resulting surface, which isolates the combined effect of
+height and weight on efficiency while preserving realistic body
+proportions. As we can see, there is an optimal point around \textbf{108
+kg} for the tallest measurements allowed.
+
+\begin{verbatim}
+Average NBA wingspan-to-height ratio: 1.063
+\end{verbatim}
+
+\begin{verbatim}
+Unable to display output for mime type(s): text/html
+\end{verbatim}
+
+\begin{verbatim}
+Unable to display output for mime type(s): text/html
+\end{verbatim}
+
+\subsection{What we discovered}\label{what-we-discovered}
+
+From our analysis, a few things stood out. We saw that height and
+experience don't play the same role for everyone. For rather short
+players, having more experience becomes a key factor in their
+performance. This suggests that being tall gives an immediate advantage,
+whereas shorter players depend more on skill development and game
+understanding.
+
+When looking at performance over age, we identified a clear peak around
+27.4 years old, which makes sense: players are still in their physical
+prime but already have enough experience to make better decisions.
+Another interesting pattern is that players who remain active at older
+ages usually display high EFF values. This is likely driven by a
+survivorship effect: only the most efficient players are able to stay in
+the league as they age.
+
+We also noticed that player position explains a big part of the
+differences in EFF per minute. Interior players, so mainly Centers (C)
+and Power Forwards (PF), tend to show higher efficiency than perimeter
+players such as Small Forwards (SF), Shooting Guards (SG), and Point
+Guards (PG). This makes sense because players in inside positions are
+closer to the basket, take higher-percentage shots, and are more
+involved in rebounds and actions near the rim, which naturally boosts
+their efficiency.
+
+We then compared Regular Season and Playoffs performances. We expected
+players to perform better in Playoffs because the games matter more, but
+what we observed is the opposite: almost everyone sees their EFF drop.
+The simplest explanation, besides higher pressure, is the increase in
+defensive intensity, as scoring becomes harder, mistakes are punished
+more, and efficiency tends to fall. Only two players in our dataset
+actually improved their EFF in the Playoffs; for all the others, it went
+down.
+
+Lastly, we used a centered polynomial regression to better understand
+how players' physical characteristics and positions relate to efficiency
+per minute. By focusing on an average player, this approach allowed us
+to interpret the results more intuitively. The model shows that wingspan
+and weight are the most relevant physical factors, with some non-linear
+effects, while height alone plays a more limited role. Position also
+remains important, as point guards and power forwards tend to display
+slightly higher efficiency compared to other roles. Overall, this
+analysis complements our earlier findings by showing how physical
+attributes and positional roles help explain differences in performance
+beyond age and experience.
+
+\section{5. Conclusion}\label{conclusion}
+
+\subsection{Summary of main findings}\label{summary-of-main-findings}
+
+In this project, we analyzed NBA player performance using physical
+attributes, age, position, and efficiency per minute metrics. Our
+results show that physical characteristics such as height, weight, and
+especially wingspan are positively related to efficiency per minute,
+although their explanatory power remains limited. We also identified a
+clear performance peak around 27.4 years old, which reflects the balance
+between physical prime and accumulated experience. In addition, player
+position plays a major role in explaining differences in efficiency,
+with point guards and power forwards generally displaying higher
+\texttt{EFF\_per\_min} than other roles.
+
+\subsection{Practical implications}\label{practical-implications}
+
+From a practical perspective, our findings suggest that physical
+attributes should be seen as advantages rather than guarantees of high
+performance. While being taller or heavier can improve efficiency on
+average, these factors alone cannot fully explain why some players
+perform better than others. The comparison between Regular Season and
+Playoffs also highlights the importance of context: most players
+experience a drop in efficiency during the Playoffs, while elite players
+tend to maintain more stable performance under pressure. This suggests
+that consistency and adaptability are key traits that may not be fully
+captured by standard physical or box-score metrics.
+
+\subsection{Limitations and future
+research}\label{limitations-and-future-research}
+
+Despite these insights, our analysis is limited by the available data.
+We focused mainly on anthropometric variables and basic performance
+statistics, which do not capture important aspects such as athletic
+testing results, tactical roles, or psychological factors. Future
+research could integrate combine data such as speed, vertical jump, or
+agility, as well as tracking data related to movement and workload.
+Using more advanced longitudinal models could also help better
+understand player development over time and improve the prediction of
+long-term performance.
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-baruch_basketball_stats}
+Baruch, Jacob. 2023. {``Basketball Players Stats Per Season (49
+Leagues).''}
+\url{https://www.kaggle.com/datasets/jacobbaruch/basketball-players-stats-per-season-49-leagues}.
+
+\bibitem[\citeproctext]{ref-captaincalculator_efficiency}
+Captain Calculator. 2025. {``Basketball Player Efficiency Calculator.''}
+\url{https://captaincalculator.com/sports/basketball/efficiency/}.
+
+\bibitem[\citeproctext]{ref-dobrucki_nba_anthropometric}
+Dobrucki, Tymoteusz. 2023. {``NBA Anthropometric Data.''}
+\url{https://www.kaggle.com/datasets/tymoteuszdobrucki/nba-anthropometric}.
+
+\end{CSLReferences}
+
+
+
+
+\end{document}
