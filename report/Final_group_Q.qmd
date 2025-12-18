@@ -2,6 +2,7 @@
 title: "Determinants of Basketball Player Performance: A Physical-Attributes Approach"
 author: "Group Q"
 date: today
+bibliography: references.bib
 format:
   html:
     toc: true
@@ -36,9 +37,9 @@ This project builds on our original proposal by incorporating a broader dataset 
 
 Our project uses two primary datasets found on kaggle.com:
 
-players_stats_by_season_full_details.xlsx, which covers professional basketball seasons from 1999 to 2020 across 49 leagues, representing around 11,000 players. It contains detailed information such as birth dates, height, weight, nationality, and high school background, along with comprehensive season statistics (points, rebounds, assists, shooting percentages, minutes, games played, and more). This dataset offers much more than raw numbers: it provides a broad view of global player performance over more than two decades, making it a strong foundation for comparative and longitudinal analysis.
+players_stats_by_season_full_details.xlsx [@baruch_basketball_stats], which covers professional basketball seasons from 1999 to 2020 across 49 leagues, representing around 11,000 players. It contains detailed information such as birth dates, height, weight, nationality, and high school background, along with comprehensive season statistics (points, rebounds, assists, shooting percentages, minutes, games played, and more). This dataset offers much more than raw numbers: it provides a broad view of global player performance over more than two decades, making it a strong foundation for comparative and longitudinal analysis.
 
-NBA_Anthropometric.csv, which contains anthropometric measurements from NBA Draft Combine events held between 2000 and 2023. The NBA Draft Combine is a yearly showcase where invited prospects undergo physical testing, medical exams, athletic drills, shooting evaluations, and five-on-five scrimmages in front of NBA coaches, general managers, and scouts. But this file includes only a limited set of physical measurements (height, weight, wingspan, arm length, etc.) converted from imperial to metric units, representing just a small part of all data collected at the Combine. The data was originally obtained through the NBA Stats API and converted from imperial to metric units.
+NBA_Anthropometric.csv [@dobrucki_nba_anthropometric], which contains anthropometric measurements from NBA Draft Combine events held between 2000 and 2023. The NBA Draft Combine is a yearly showcase where invited prospects undergo physical testing, medical exams, athletic drills, shooting evaluations, and five-on-five scrimmages in front of NBA coaches, general managers, and scouts. But this file includes only a limited set of physical measurements (height, weight, wingspan, arm length, etc.) converted from imperial to metric units, representing just a small part of all data collected at the Combine. The data was originally obtained through the NBA Stats API and converted from imperial to metric units.
 
 Both datasets were loaded into Python and inspected to understand their structure.
 
@@ -72,8 +73,8 @@ pd.set_option('display.max_columns', None)
 
 # Load Datasets
 # Note: Ensure these files are in the same directory as the .qmd file
-file_path1 = "players_stats_by_season_full_details.xlsx"
-file_path2 = "NBA_Anthropometric.csv"
+file_path1 = "../data/raw/players_stats_by_season_full_details.xlsx" 
+file_path2 = "../data/raw/NBA_Anthropometric.csv"
 
 try:
     df1 = pd.read_excel(file_path1)
@@ -206,7 +207,7 @@ merged = calcul_age_debut_saison(merged)
 ```
 To make players comparable despite differences in playing time, we normalized all box-score statistics on a per-minute basis. This step was necessary because raw totals (e.g., points, rebounds, assists) are heavily influenced by the number of minutes a player spends on the court. By creating variables such as `PTS_per_min`, `REB_per_min`, `AST_per_min`, and all other equivalent per-minute metrics, we ensured that the analysis reflected true performance intensity rather than total playing time. 
 
-To evaluate overall performance, we adopted the standard NBA Efficiency (EFF) metric but normalized it to a per-minute basis. While standard per-game EFF scores typically range from 10 to 30, our resulting `EFF_per_min` metric scales down to a range of 0 to 1.5 . The metric is calculated by summing a player's positive contributions (points, rebounds, assists, steals, blocks) and subtracting the negative ones (missed shots, missed free throws, and turnovers), all divided by minutes played. To interpret this scale: a value of 0.5 EFF/min represents a solid rotation player, while anything >1.0 EFF/min indicates elite, MVP-level productivity.
+To evaluate overall performance, we adopted the standard NBA Efficiency (EFF)[@captaincalculator_efficiency] metric but normalized it to a per-minute basis. While standard per-game EFF scores typically range from 10 to 30, our resulting `EFF_per_min` metric scales down to a range of 0 to 1.5 . The metric is calculated by summing a player's positive contributions (points, rebounds, assists, steals, blocks) and subtracting the negative ones (missed shots, missed free throws, and turnovers), all divided by minutes played. To interpret this scale: a value of 0.5 EFF/min represents a solid rotation player, while anything >1.0 EFF/min indicates elite, MVP-level productivity.
 ```{python}
 #créattion d'une colonne keyfactors qui est unique pour chaque ligne de merged
 merged['keyfactor'] = merged.index
@@ -269,8 +270,8 @@ merged_NBA_regular.dropna(subset=model_vars, inplace=True)
 merged_NBA_regular = merged_NBA_regular[merged_NBA_regular['Simplified_Position'] != 'Unknown'].copy()
 
 # 5. Save the filtered dataset
-merged_NBA_regular.to_csv('merged_NBA_regular.csv', index=False)
-merged_NBA_playoffs.to_csv('merged_NBA_playoffs.csv', index=False)
+merged_NBA_regular.to_csv('data/processed/merged_NBA_regular.csv', index=False)
+merged_NBA_playoffs.to_csv('data/processed/merged_NBA_playoffs.csv', index=False)
 ```
 
 ## Main challenges 
@@ -490,7 +491,7 @@ plt.grid(True, linestyle='--', alpha=0.6)
 plt.tight_layout()
 
 # Save the figure
-plt.savefig('efficiency_evolution_by_age.png', dpi=300, bbox_inches="tight")
+plt.savefig('report/figures/efficiency_evolution_by_age.png', dpi=300, bbox_inches="tight")
 
 plt.show()
 ```
@@ -705,7 +706,7 @@ fig.legend(handles, labels, loc='upper center', ncol=2, bbox_to_anchor=(0.5, 0.0
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 # Save the figure
-plt.savefig('performance_evolution_by_age.png', dpi=300, bbox_inches="tight")
+plt.savefig('report/figures/performance_evolution_by_age.png', dpi=300, bbox_inches="tight")
 plt.close(fig)
 
 ```
@@ -780,7 +781,7 @@ fig.legend(handles, labels, loc='upper center', ncol=2, bbox_to_anchor=(0.5, 0.0
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 # Save the figure
-plt.savefig('performance_evolution_by_age_playoffs.png', dpi=300, bbox_inches="tight")
+plt.savefig('report/figures/performance_evolution_by_age_playoffs.png', dpi=300, bbox_inches="tight")
 plt.close(fig)
 
 ```
