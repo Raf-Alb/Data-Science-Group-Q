@@ -1,6 +1,6 @@
 ---
 title: "Determinants of Basketball Player Performance: A Physical-Attributes Approach"
-author: "Group Q"
+author: "Group Q: Dolindo Allegri, Rafael Alves Albuquerque, Jean-Paul Fahmy, Alexander Salmeron Vasylenko"
 date: today
 bibliography: references.bib
 format:
@@ -270,8 +270,8 @@ merged_NBA_regular.dropna(subset=model_vars, inplace=True)
 merged_NBA_regular = merged_NBA_regular[merged_NBA_regular['Simplified_Position'] != 'Unknown'].copy()
 
 # 5. Save the filtered dataset
-merged_NBA_regular.to_csv('data/processed/merged_NBA_regular.csv', index=False)
-merged_NBA_playoffs.to_csv('data/processed/merged_NBA_playoffs.csv', index=False)
+merged_NBA_regular.to_csv('../data/processed/merged_NBA_regular.csv', index=False)
+merged_NBA_playoffs.to_csv('../data/processed/merged_NBA_playoffs.csv', index=False)
 ```
 
 ## Main challenges 
@@ -491,7 +491,7 @@ plt.grid(True, linestyle='--', alpha=0.6)
 plt.tight_layout()
 
 # Save the figure
-plt.savefig('report/figures/efficiency_evolution_by_age.png', dpi=300, bbox_inches="tight")
+plt.savefig('figures/efficiency_evolution_by_age.png', dpi=300, bbox_inches="tight")
 
 plt.show()
 ```
@@ -706,12 +706,12 @@ fig.legend(handles, labels, loc='upper center', ncol=2, bbox_to_anchor=(0.5, 0.0
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 # Save the figure
-plt.savefig('report/figures/performance_evolution_by_age.png', dpi=300, bbox_inches="tight")
+plt.savefig('figures/performance_evolution_by_age.png', dpi=300, bbox_inches="tight")
 plt.close(fig)
 
 ```
 
-![Regular Season Performance](performance_evolution_by_age.png)
+![Regular Season Performance](figures/performance_evolution_by_age.png)
 
 ```{python}
 #  1. Filtering multi-season players and data cleaning 
@@ -781,12 +781,12 @@ fig.legend(handles, labels, loc='upper center', ncol=2, bbox_to_anchor=(0.5, 0.0
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 # Save the figure
-plt.savefig('report/figures/performance_evolution_by_age_playoffs.png', dpi=300, bbox_inches="tight")
+plt.savefig('figures/performance_evolution_by_age_playoffs.png', dpi=300, bbox_inches="tight")
 plt.close(fig)
 
 ```
 
-![Playoffs Performance](performance_evolution_by_age_playoffs.png)  
+![Playoffs Performance](figures/performance_evolution_by_age_playoffs.png)  
 
 **Regular season vs. playoffs performance**
 
